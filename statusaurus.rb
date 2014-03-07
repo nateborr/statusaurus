@@ -3,7 +3,7 @@ require 'sinatra'
 require 'net/http'
 require 'uri'
 
-post 'deployment' do
+post '/deployment' do
   # Get parameter data from Heroku deploy hook.
   app_name = params[:app]
   commit_sha = params[:head_long]
@@ -16,7 +16,7 @@ post 'deployment' do
 
   url = "https://api.hipchat.com/v1/rooms/topic?auth_token=#{hipchat_token}"
   uri = URI.parse url
-  
+
   response = Net::HTTP.post_form(
     uri,
     {
@@ -26,5 +26,5 @@ post 'deployment' do
     }
   )
 
-  #Net::HTTP.get(URI.parse(url))
+  ['OK'].to_json
 end
