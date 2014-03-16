@@ -4,9 +4,11 @@ require 'json'
 require 'net/http'
 require 'uri'
 
+HEROKU_APP_NAME_PREFIX = ENV['HEROKU_APP_NAME_PREFIX'] || ''
+
 post '/deployment' do
   # Get parameter data from Heroku deploy hook.
-  app_name = params[:app]
+  app_name = process_app_name(params[:app])
   commit_sha = params[:head_long]
 
   commit_name = params[:head]
@@ -36,6 +38,15 @@ post '/deployment' do
   )
 
   ['OK'].to_json
+end
+
+def process_app_name(app_name)
+  prefix_match = /#{HEROKU_APP_NAME_PREFIX}(.+)/.match(app_name)
+  if prefix_match
+    prefix_match[1].upcase
+  else
+    app_name
+  end
 end
 
 def get_pull_request_data
