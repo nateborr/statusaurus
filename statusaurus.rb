@@ -19,11 +19,17 @@ post '/deployment' do
     commit_name = "PR #{pr_numbers.first}"
   end
 
-  # Update HipChat room topic with the app name and SHA.
   hipchat_token = 'b1cae1fc129a2e4b3b738d440a17b6'
   hipchat_room_id = '471229'
 
-  message = "#{commit_name} - #{app_name}"
+  # Get existing deployment data from current HipChat topic.
+  existing_topic = get_hipchat_room_topic(hipchat_room_id, hipchat_token)
+  status_hash = parse_topic(existing_topic)
+
+  # Update HipChat room topic.
+  #message = "#{commit_name} - #{app_name}"
+  status_hash[app_name] = commit_name
+  message = status_data_to_s(status_hash)
 
   url = "https://api.hipchat.com/v1/rooms/topic?auth_token=#{hipchat_token}"
   uri = URI.parse url
@@ -87,6 +93,15 @@ def parse_topic(topic)
   end
 
   status_hash
+end
+
+def status_data_to_s(status_hash)
+  statuses = []
+  status_hash.keys.sort {|x,y| y.downcase <=> x.downcase}.each do |app_name|
+    statuses << "#{status_hash[app_name]} - #{app_name}"
+  end
+
+  statuses.join(' :: ')
 end
 
 def get_pull_request_data
