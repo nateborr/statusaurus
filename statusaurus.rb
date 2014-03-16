@@ -49,6 +49,24 @@ def process_app_name(app_name)
   end
 end
 
+def get_hipchat_room_topic(room_id, hipchat_token)
+  topic = ''
+
+  hc_url = "https://api.hipchat.com/v1/rooms/show?"\
+    "room_id=#{room_id}&auth_token=#{hipchat_token}"
+  uri = URI.parse hc_url
+
+  response = Net::HTTP.get_response(uri)
+
+  # Parse the response body for a 2xx response.
+  if /2\d{2}$/ =~ response.code
+    body_hash = JSON.parse(response.body)
+    topic = body_hash['room']['topic']
+  end
+
+  topic
+end
+
 def get_pull_request_data
   # Get open pull requests from GitHub.
   gh_url = "https://api.github.com/repos/hubbubhealth/hubbub-main/pulls"\
