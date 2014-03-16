@@ -14,14 +14,14 @@ post '/deployment' do
   # Match the SHA to an open GitHub pull request, if any.
   pr_numbers = pull_request_numbers_for_sha(commit_sha)
   if !pr_numbers.first.nil?
-    commit_name = pr_numbers.first
+    commit_name = "PR #{pr_numbers.first}"
   end
 
   # Update HipChat room topic with the app name and SHA.
   hipchat_token = 'b1cae1fc129a2e4b3b738d440a17b6'
   hipchat_room_id = '471229'
 
-  message = "#{commit_name} is in #{app_name}"
+  message = "#{commit_name} - #{app_name}"
 
   url = "https://api.hipchat.com/v1/rooms/topic?auth_token=#{hipchat_token}"
   uri = URI.parse url
