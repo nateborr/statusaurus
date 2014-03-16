@@ -67,6 +67,28 @@ def get_hipchat_room_topic(room_id, hipchat_token)
   topic
 end
 
+def parse_topic(topic)
+  status_hash = {}
+
+  # For each status, match on a complete line that looks like:
+  # <commit description> - <app name>
+  # ...making some allowances for differences in whitespace.
+  status_matcher = /^\s*(.+) - (.+)\s*$/
+
+  statuses = topic.split('::').map(&:strip)
+  statuses.each do |status|
+    match_data = status_matcher.match(status)
+    if match_data
+      app_name = match_data[2].strip
+      commit_description = match_data[1].strip
+
+      status_hash[process_app_name(app_name)] = commit_description
+    end
+  end
+
+  status_hash
+end
+
 def get_pull_request_data
   # Get open pull requests from GitHub.
   gh_url = "https://api.github.com/repos/hubbubhealth/hubbub-main/pulls"\
