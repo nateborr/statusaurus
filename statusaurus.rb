@@ -6,7 +6,6 @@ require 'uri'
 
 HIPCHAT_TOKEN = ENV['HIPCHAT_TOKEN'] || ''
 HIPCHAT_ROOM_ID = ENV['HIPCHAT_ROOM_ID'] || ''
-# 79de2a4541b1198813aa42bf8b51d4aabee81f38
 GITHUB_ACCESS_TOKEN = ENV['GITHUB_ACCESS_TOKEN'] || ''
 HEROKU_APP_NAME_PREFIX = ENV['HEROKU_APP_NAME_PREFIX'] || ''
 
@@ -23,15 +22,11 @@ post '/deployment' do
     commit_name = "PR #{pr_numbers.first}"
   end
 
-  #hipchat_token = 'b1cae1fc129a2e4b3b738d440a17b6'
-  #hipchat_room_id = '471229'
-
   # Get existing deployment data from current HipChat topic.
   existing_topic = get_hipchat_room_topic(HIPCHAT_ROOM_ID, HIPCHAT_TOKEN)
   status_hash = parse_topic(existing_topic)
 
   # Update HipChat room topic.
-  #message = "#{commit_name} - #{app_name}"
   status_hash[app_name] = commit_name
   message = status_data_to_s(status_hash)
 
