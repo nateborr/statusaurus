@@ -4,6 +4,10 @@ require 'json'
 require 'net/http'
 require 'uri'
 
+HIPCHAT_TOKEN = ENV['HIPCHAT_TOKEN'] || ''
+HIPCHAT_ROOM_ID = ENV['HIPCHAT_ROOM_ID'] || ''
+# 79de2a4541b1198813aa42bf8b51d4aabee81f38
+GITHUB_ACCESS_TOKEN = ENV['GITHUB_ACCESS_TOKEN'] || ''
 HEROKU_APP_NAME_PREFIX = ENV['HEROKU_APP_NAME_PREFIX'] || ''
 
 post '/deployment' do
@@ -19,11 +23,11 @@ post '/deployment' do
     commit_name = "PR #{pr_numbers.first}"
   end
 
-  hipchat_token = 'b1cae1fc129a2e4b3b738d440a17b6'
-  hipchat_room_id = '471229'
+  #hipchat_token = 'b1cae1fc129a2e4b3b738d440a17b6'
+  #hipchat_room_id = '471229'
 
   # Get existing deployment data from current HipChat topic.
-  existing_topic = get_hipchat_room_topic(hipchat_room_id, hipchat_token)
+  existing_topic = get_hipchat_room_topic(HIPCHAT_ROOM_ID, HIPCHAT_TOKEN)
   status_hash = parse_topic(existing_topic)
 
   # Update HipChat room topic.
@@ -31,13 +35,13 @@ post '/deployment' do
   status_hash[app_name] = commit_name
   message = status_data_to_s(status_hash)
 
-  url = "https://api.hipchat.com/v1/rooms/topic?auth_token=#{hipchat_token}"
+  url = "https://api.hipchat.com/v1/rooms/topic?auth_token=#{HIPCHAT_TOKEN}"
   uri = URI.parse url
 
   response = Net::HTTP.post_form(
     uri,
     {
-      room_id: hipchat_room_id,
+      room_id: HIPCHAT_ROOM_ID,
       topic: message,
       from: 'Statusaurus'
     }
@@ -107,7 +111,7 @@ end
 def get_pull_request_data
   # Get open pull requests from GitHub.
   gh_url = "https://api.github.com/repos/hubbubhealth/hubbub-main/pulls"\
-  "?access_token=79de2a4541b1198813aa42bf8b51d4aabee81f38"
+  "?access_token=#{GITHUB_ACCESS_TOKEN}"
 
   uri = URI.parse gh_url
 
