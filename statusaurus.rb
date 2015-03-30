@@ -4,10 +4,16 @@ require 'json'
 require 'net/http'
 require 'uri'
 
-HIPCHAT_TOKEN = ENV['HIPCHAT_TOKEN'] || ''
-HIPCHAT_ROOM_ID = ENV['HIPCHAT_ROOM_ID'] || ''
-GITHUB_ACCESS_TOKEN = ENV['GITHUB_ACCESS_TOKEN'] || ''
-HEROKU_APP_NAME_PREFIX = ENV['HEROKU_APP_NAME_PREFIX'] || ''
+def get_environment_variable(name)
+  ENV[String(name)] || ''
+end
+
+HIPCHAT_TOKEN = get_environment_variable('HIPCHAT_TOKEN')
+HIPCHAT_ROOM_ID = get_environment_variable('HIPCHAT_ROOM_ID')
+GITHUB_ACCESS_TOKEN = get_environment_variable('GITHUB_ACCESS_TOKEN')
+GITHUB_OWNER = get_environment_variable('GITHUB_OWNER')
+GITHUB_REPO = get_environment_variable('GITHUB_REPO')
+HEROKU_APP_NAME_PREFIX = get_environment_variable('HEROKU_APP_NAME_PREFIX')
 
 post '/deployment' do
   # Get parameter data from Heroku deploy hook.
@@ -105,8 +111,8 @@ end
 
 def get_pull_request_data
   # Get open pull requests from GitHub.
-  gh_url = "https://api.github.com/repos/hubbubhealth/hubbub-main/pulls"\
-  "?access_token=#{GITHUB_ACCESS_TOKEN}"
+  gh_url = "https://api.github.com/repos/#{GITHUB_OWNER}/#{GITHUB_REPO}/"\
+  "pulls?access_token=#{GITHUB_ACCESS_TOKEN}"
 
   uri = URI.parse gh_url
 
